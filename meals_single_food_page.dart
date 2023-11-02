@@ -26,7 +26,6 @@ class _MealsSingleFoodPageState extends State<MealsSingleFoodPage> {
 
   //function to add an item to cart
   Future<void> addToCart(String cartItem, String cartItemQuantity, String cartItemPrice, String cartItemImage) async{
-
     //check if user is logged in or not
     if(user != null){
 
@@ -87,7 +86,7 @@ class _MealsSingleFoodPageState extends State<MealsSingleFoodPage> {
     scaffoldMessenger.showSnackBar(
       SnackBar(
         content: Text(snackBarContent),
-        duration: Duration(seconds: 3),
+        duration: const Duration(seconds: 3),
       ),
     );
   }
@@ -105,11 +104,11 @@ class _MealsSingleFoodPageState extends State<MealsSingleFoodPage> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => MealsCartPage()
+                      builder: (context) => const MealsCartPage()
                   )
               );
             },
-            icon: Icon(Icons.shopping_cart_outlined),
+            icon: const Icon(Icons.shopping_cart_outlined),
           )
         ],
       ),
@@ -132,7 +131,7 @@ class _MealsSingleFoodPageState extends State<MealsSingleFoodPage> {
                   fontSize: 24
                   )
                 ),
-                Text('RM ${widget.menu.price}', style: const TextStyle(
+                Text('RM ${double.parse(widget.menu.price).toStringAsFixed(2)}', style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 20
                 )
@@ -155,7 +154,7 @@ class _MealsSingleFoodPageState extends State<MealsSingleFoodPage> {
             indent: 16.0,
             endIndent: 16.0,// Set the height of the divider
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           // Quantity Selector Row
@@ -164,7 +163,7 @@ class _MealsSingleFoodPageState extends State<MealsSingleFoodPage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Text(
+                const Text(
                   'Quantity:',
                   style: TextStyle(
                     fontSize: 18,
@@ -173,17 +172,17 @@ class _MealsSingleFoodPageState extends State<MealsSingleFoodPage> {
                 Row(
                   children: <Widget>[
                     IconButton(
-                      icon: Icon(Icons.remove),
+                      icon: const Icon(Icons.remove),
                       onPressed: decrementQuantity,
                     ),
                     Text(
                       quantity.toString(),
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 18,
                       ),
                     ),
                     IconButton(
-                      icon: Icon(Icons.add),
+                      icon: const Icon(Icons.add),
                       onPressed: incrementQuantity,
                     ),
                   ],
@@ -201,9 +200,9 @@ class _MealsSingleFoodPageState extends State<MealsSingleFoodPage> {
                     child: ElevatedButton(
                       onPressed: (){
                         //on pressed action
-                        int? totalPrice = 0;
+                        double? totalPrice = 0;
 
-                        totalPrice = quantity * int.parse(widget.menu.price);
+                        totalPrice = quantity * double.parse(widget.menu.price);
                         addToCart(widget.menu.name, quantity.toString(), totalPrice.toString(), widget.menu.imageUrl);
                         showSnackBar(context, 'Item added to cart!');
                       },

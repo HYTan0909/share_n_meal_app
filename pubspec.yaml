@@ -34,23 +34,29 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
+  intl: ^0.18.0
+  http: ^0.13.5
+  badges: ^3.1.2
   cupertino_icons: ^1.0.2
   google_fonts: ^4.0.4
   go_router: ^8.0.1
   firebase_core: ^2.15.0
   firebase_auth: ^4.7.2
   cloud_firestore: ^4.8.4
+  firebase_storage: ^11.3.1
+  file_picker: ^5.3.5
   provider: ^6.0.5
   firebase_ui_auth: ^1.6.2
-  google_maps_flutter: ^2.1.1
+  google_maps_flutter: ^2.5.0
+  flutter_google_places: 0.3.0
+  place_picker: ^0.10.0
 #  # Optional dependencies for additional features like geocoding and places
-  geolocator: ^8.0.0  # For getting device location
+  geolocator: ^9.0.1  # For getting device location
   location: ^5.0.3
   geocoding: ^2.1.0
   google_maps_webservice: ^0.0.19  # For making requests to Geocoding and Places APIs
 #
 #  # Optional dependency for directions and routes
-#  flutter_polyline_points: ^2.0.0  # For drawing polylines on the map
 #
 #  # Optional dependency for searching and displaying places
 #  flutter_google_places: ^0.3.0
@@ -82,6 +88,7 @@ flutter:
   assets:
   - assets/codelab.png
   - assets/colleges.png
+  - assets/outOfOperationHours.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

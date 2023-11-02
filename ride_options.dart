@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:share_n_meal_app/home_page.dart';
 import 'package:share_n_meal_app/ride_driver_main_page.dart';
+import 'package:share_n_meal_app/ride_passenger_main_page.dart';
 
 class RideOptions extends StatelessWidget {
   const RideOptions({Key? key}) : super(key: key);
@@ -81,6 +82,11 @@ class RideOptions extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: (){
                       //on press action
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => RidePassengerMainPage(),)
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.all(40),

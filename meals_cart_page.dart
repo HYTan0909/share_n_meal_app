@@ -18,9 +18,35 @@ class MealsCartPage extends StatefulWidget {
 class _MealsCartPageState extends State<MealsCartPage> {
   //get the current user
   User? user = FirebaseAuth.instance.currentUser;
-
   //create a date time variable
   DateTime? orderDateTime;
+  //current operating state
+  bool isOperating = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Call the function to fetch and update 'isOperating' when the widget initializes.
+    fetchCanteenState();
+  }
+
+  //function to update the operating state in Firestore
+  Future<void> fetchCanteenState() async {
+    try {
+      final canteenStateDoc = await FirebaseFirestore.instance.collection('canteenState').doc('GmWhGb5cSg1XOVGt4J6m').get();
+      if (canteenStateDoc.exists) {
+        final data = canteenStateDoc.data();
+        final isOperatingFromFirestore = data?['isOperating'] as bool;
+
+        // Update the state with the value from Firestore.
+        setState(() {
+          isOperating = isOperatingFromFirestore;
+        });
+      }
+    } catch (e) {
+      print('Error fetching data from Firestore: $e');
+    }
+  }
 
   //function to create a date time picker for user to input the order date and time
   Future<void> _showDateTimePicker(BuildContext context) async {
@@ -32,6 +58,7 @@ class _MealsCartPageState extends State<MealsCartPage> {
     );
 
     if (selectedOrderDate != null) {
+      // ignore: use_build_context_synchronously
       TimeOfDay? selectedOrderTime = await showTimePicker(
         context: context,
         initialTime: TimeOfDay.now(),
@@ -62,7 +89,7 @@ class _MealsCartPageState extends State<MealsCartPage> {
     scaffoldMessenger.showSnackBar(
       SnackBar(
         content: Text(snackBarContent),
-        duration: Duration(seconds: 3),
+        duration: const Duration(seconds: 3),
       ),
     );
   }
@@ -148,8 +175,8 @@ class _MealsCartPageState extends State<MealsCartPage> {
               });
 
               return AlertDialog(
-                title: Text('Are you sure you want to delete this item? '),
-                actions: [
+                title: const Text('Are you sure you want to delete this item? '),
+                actions: <Widget>[
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -157,7 +184,7 @@ class _MealsCartPageState extends State<MealsCartPage> {
                         onPressed: () {
                           Navigator.of(context).pop(); // Close the dialog
                         },
-                        child: Text('Cancel'),
+                        child: const Text('Cancel'),
                       ),
                       ElevatedButton(
                           onPressed: () async {
@@ -252,18 +279,18 @@ class _MealsCartPageState extends State<MealsCartPage> {
                   cartList.add(cart);
                 });
 
-                int totalPrice = 0;
+                double totalPrice = 0.0;
                 int count = 0;
                 String name = '';
 
                 for (count; count < cartList.length; count++) {
                   totalPrice +=
-                      int.parse(cartList[count].cartItemPrice);
+                      double.parse(cartList[count].cartItemPrice);
                   name += cartList[count].cartItemQuantity +
                       'x ' +
                       cartList[count].cartItem +
                       '  RM' +
-                      cartList[count].cartItemPrice +
+                      double.parse(cartList[count].cartItemPrice).toStringAsFixed(2) +
                       ', ';
                 }
                 print(totalPrice);
@@ -290,15 +317,15 @@ class _MealsCartPageState extends State<MealsCartPage> {
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
                                 )),
-                                trailing: Text('Total: RM${cart.cartItemPrice}', style: const TextStyle(
+                                trailing: Text('Total: RM${double.parse(cart.cartItemPrice).toStringAsFixed(2)}', style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                 )),
                               );
                             }
                         ),
-                        Spacer(),
-                        Text('Total amount: RM$totalPrice', style: const TextStyle(
+                        const Spacer(),
+                        Text('Total amount: RM${totalPrice.toStringAsFixed(2)}', style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         )),
@@ -310,9 +337,9 @@ class _MealsCartPageState extends State<MealsCartPage> {
                       onPressed: () {
                         Navigator.of(context).pop(); // Close the dialog
                       },
-                      child: Text('Cancel'),
+                      child: const Text('Cancel'),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 32,
                     ),
                     ElevatedButton(
@@ -328,7 +355,8 @@ class _MealsCartPageState extends State<MealsCartPage> {
                             String orderTotal,
                             String userId,
                             String orderStatus,
-                            String orderTime) async {
+                            String orderTime,
+                            String deleteReason) async {
                           //check if user is logged in or not
                           if (user != null) {
                             try {
@@ -339,6 +367,7 @@ class _MealsCartPageState extends State<MealsCartPage> {
                                 'orderTotal': orderTotal,
                                 'orderStatus': orderStatus,
                                 'orderTime': orderTime,
+                                'deleteReason': deleteReason,
                               });
                             } catch (e) {
                               print('Error creating order. $e');
@@ -347,7 +376,7 @@ class _MealsCartPageState extends State<MealsCartPage> {
                         }
 
                         createOrder(name, totalPrice.toString(), user!.uid,
-                            'Preparing', formattedOrderDateTime);
+                            'Preparing', formattedOrderDateTime, '');
 
                         showSnackBar(context, 'Order Created Successfully');
 
@@ -356,9 +385,9 @@ class _MealsCartPageState extends State<MealsCartPage> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => MealOptions()));
+                                builder: (context) => const MealOptions()));
                       },
-                      child: Text('Confirm Order'),
+                      child: const Text('Confirm Order'),
                     ),
                   ],
                 );
@@ -448,7 +477,7 @@ class _MealsCartPageState extends State<MealsCartPage> {
                           child: Container(
                             height: 60,
                             width: 60,
-                            child: Icon(
+                            child: const Icon(
                               Icons.delete,
                               color: Colors
                                   .red, // You can customize the icon color
@@ -466,7 +495,7 @@ class _MealsCartPageState extends State<MealsCartPage> {
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
                             )),
-                        trailing: Text('RM ${cart.cartItemPrice}',
+                        trailing: Text('RM ${double.parse(cart.cartItemPrice).toStringAsFixed(2)}',
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
@@ -496,7 +525,12 @@ class _MealsCartPageState extends State<MealsCartPage> {
                               child: ElevatedButton(
                                 onPressed: () {
                                   //on pressed action
-                                  _showDateTimePicker(context);
+                                  if(isOperating == false) {
+                                    showSnackBar(context, 'Out of canteen operation hour. Please try again later. ');
+                                  }
+                                  else {
+                                    _showDateTimePicker(context);
+                                  }
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.white,
@@ -530,7 +564,7 @@ class _MealsCartPageState extends State<MealsCartPage> {
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) => MealOptions()));
+                                          builder: (context) => const MealOptions()));
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.white,

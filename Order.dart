@@ -9,6 +9,7 @@ class Orders{
   final String status;
   final String time;
   final String total;
+  final String deleteReason;
 
   Orders({
     required this.userId,
@@ -17,6 +18,7 @@ class Orders{
     required this.status,
     required this.time,
     required this.total,
+    required this.deleteReason,
   });
 
 }

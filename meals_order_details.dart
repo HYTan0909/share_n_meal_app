@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:share_n_meal_app/Order.dart';
 
 class MealsOrderDetails extends StatefulWidget {
@@ -23,9 +22,7 @@ class _MealsOrderDetailsState extends State<MealsOrderDetails> {
         backgroundColor: Colors.deepPurpleAccent,
         title: const Text('Share N\' Meal App'),
       ),
-      body: Stack(
-
-      children: [
+      body: Stack(children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -36,7 +33,7 @@ class _MealsOrderDetailsState extends State<MealsOrderDetails> {
                 children: <Widget>[
                   Center(
                     child: Text(
-                      'Order History',
+                      'Order Details',
                       style: TextStyle(
                         fontSize: 36.0, // Adjust the font size as needed
                         fontWeight: FontWeight.bold,
@@ -52,41 +49,61 @@ class _MealsOrderDetailsState extends State<MealsOrderDetails> {
                 ],
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 12,
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
                 'Order ID: ${widget.order.id.substring(0, 10)}',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 12,
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                'Order Time: ${widget.order.time}',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                'Order Pickup Time: ${widget.order.time}',
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 12,
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
                 'Order Status: ${widget.order.status}',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: widget.order.status == 'Preparing' ? Colors.deepOrangeAccent : Colors.green,),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                  color: widget.order.status == 'Preparing'
+                      ? Colors.deepOrangeAccent
+                      : widget.order.status == 'Removed'
+                      ? Colors.red
+                      : Colors.green,
+                ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 12,
             ),
-            Padding(
+            widget.order.status == 'Removed'
+            ? Padding(
               padding: const EdgeInsets.all(8.0),
+              child: Text(
+                'Order removed reason: ${widget.order.deleteReason}',
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold, fontSize: 20),
+              ),
+            )
+            : const SizedBox(
+              height: 12,
+            ),
+            const Padding(
+              padding: EdgeInsets.all(8.0),
               child: Text(
                 'Order Items: ',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
@@ -95,14 +112,6 @@ class _MealsOrderDetailsState extends State<MealsOrderDetails> {
             Expanded(
               child: Container(
                 height: 1000,
-                // width: double.infinity,
-                // decoration: BoxDecoration(
-                //     color: Colors.grey[200], // Background color
-                //     borderRadius: BorderRadius.vertical(
-                //       top: Radius.circular(50.0),
-                //       bottom: Radius.circular(50.0),
-                //     )
-                // ),
                 child: ListView.builder(
                     itemCount: widget.order.item.split(', ').length,
                     itemBuilder: (context, index) {
@@ -111,14 +120,14 @@ class _MealsOrderDetailsState extends State<MealsOrderDetails> {
                       return ListTile(
                         title: Text(
                           item,
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 16),
                         ),
                       );
                     }),
               ),
             ),
-            Spacer(),
+            const Spacer(),
           ],
         ),
         Positioned(
@@ -127,8 +136,8 @@ class _MealsOrderDetailsState extends State<MealsOrderDetails> {
           child: Padding(
             padding: const EdgeInsets.all(16.0), // Add some padding
             child: Text(
-              'Total Amount: RM${widget.order.total}',
-              style: TextStyle(
+              'Total Amount: RM${double.parse(widget.order.total).toStringAsFixed(2)}',
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 20,
               ),

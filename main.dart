@@ -100,7 +100,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'Firebase Meetup',
+      title: 'Share N\' Meal',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         buttonTheme: Theme.of(context).buttonTheme.copyWith(

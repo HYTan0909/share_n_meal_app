@@ -17,14 +17,14 @@ class _MealsHistoryPageState extends State<MealsHistoryPage> {
   User? user = FirebaseAuth.instance.currentUser;
 
   //reference to orders collection
-  CollectionReference orderCollection = FirebaseFirestore.instance.collection('orders');
+  CollectionReference orderCollection =
+      FirebaseFirestore.instance.collection('orders');
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-
         children: <Widget>[
           const Padding(
             padding: EdgeInsets.all(16.0),
@@ -52,37 +52,43 @@ class _MealsHistoryPageState extends State<MealsHistoryPage> {
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
               //connect to Firestore and access the 'orders' documents
-              stream: FirebaseFirestore.instance.collection('orders').where('orderStatus', isEqualTo: 'Completed').where('userId', isEqualTo: user!.uid).snapshots(),
+              stream: orderCollection
+                  .where('orderStatus', whereIn: ['Completed', 'Removed'])
+                  .where('userId', isEqualTo: user!.uid)
+                  .orderBy('orderTime', descending: true)
+                  .snapshots(),
               builder: (context, snapshot) {
-                if(!snapshot.hasData){
+                if (!snapshot.hasData) {
                   return const Center(
-                      child: CircularProgressIndicator()  //a loading indicator
-                  );
+                      child: CircularProgressIndicator() //a loading indicator
+                      );
                 }
 
                 //use ?. to safely access docs property
                 final docs = snapshot.data?.docs;
 
-                if(docs == null || docs.isEmpty){
-                  return const Text('No data available'); //handle case where no documents are retrieved
+                if (docs == null || docs.isEmpty) {
+                  return const Center(
+                    child: Text(
+                        'No data available'),
+                  ); //handle case where no documents are retrieved
                 }
 
                 //call menu from cloud Firestore
                 List<Orders> ordersList = []; //call the Menu model class
                 docs.forEach((doc) {
-
                   // Access the document ID
                   String documentId = doc.id;
 
                   //create a Orders object using documents stored in Firestore
                   Orders orders = Orders(
-                      userId: user! .uid,
+                      userId: doc['userId'],
                       id: documentId,
                       item: doc['orderItem'],
                       status: doc['orderStatus'],
                       time: doc['orderTime'],
                       total: doc['orderTotal'],
-                  );
+                      deleteReason: doc['deleteReason']);
                   ordersList.add(orders);
                 });
 
@@ -94,36 +100,34 @@ class _MealsHistoryPageState extends State<MealsHistoryPage> {
                       return ListTile(
                         //leading: Icon(Icons.history),
                         title: Text('Order ID: ${orders.id.substring(0, 10)}',
-                          style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        )
-                      ),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            )),
                         subtitle: Text('${orders.time}',
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                            )
-                        ),
+                            )),
                         trailing: Text('Status: ${orders.status}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              color: Colors.green,
-                            )
-                        ),
-                        onTap: (){
+                              color: orders.status == 'Removed'
+                                  ? Colors.redAccent
+                                  : Colors.green,
+                            )),
+                        onTap: () {
                           //on tap action
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => MealsOrderDetails(order: ordersList[index],)
-                              )
-                          );
+                                  builder: (context) => MealsOrderDetails(
+                                        order: ordersList[index],
+                                      )));
                         },
                       );
-                    }
-                );
+                    });
               },
             ),
           ),
